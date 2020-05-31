@@ -32,6 +32,11 @@ Terraform seemed to think that after this change was applied, that all work was 
 had added a tag saying the storage class depends on the cluster.
 Colour me unimpressed and frustrated with terraform, yet again!
 
+Initially created storage class with regional persistent disks on GKE, as these are more resilient, and I typically
+use a regional cluster. However, for this deployment I just used a single zone with preemptible nodes to reduce costs.
+This meant that there were no other nodes to replicate the disk to, and when provisioned, it could not be attached,
+so this had to be re-created.
+
 ## Opinions in approach
 
 ### Separate slow moving infrastructure from fast moving software

@@ -74,7 +74,7 @@ resource kubernetes_storage_class retained_ssd {
   volume_binding_mode = "WaitForFirstConsumer"
   parameters = {
     type = "pd-ssd"
-    replication-type = "regional-pd"
+    replication-type = "none"
   }
 
   depends_on = [google_container_cluster.mark_interview_cluster]
@@ -84,15 +84,6 @@ resource kubernetes_storage_class retained_ssd {
 resource kubernetes_service frontend {
   metadata {
     name = "frontend-external"
-    labels = {
-      "skaffold.dev/builder"    = "google-cloud-build"
-      "skaffold.dev/cleanup"    = "true"
-      "skaffold.dev/deployer"   = "kubectl"
-      "skaffold.dev/profile.0"  = "gcb"
-      "skaffold.dev/run-id"     = "e7244b0b-92c7-48ba-b276-b1f118a811ae"
-      "skaffold.dev/tag-policy" = "git-commit"
-      "skaffold.dev/tail"       = "true"
-    }
   }
   spec {
     selector = {
@@ -106,6 +97,11 @@ resource kubernetes_service frontend {
       target_port = "8080"
     }
     type = "LoadBalancer"
+  }
+  lifecycle {
+    ignore_changes = [
+      metadata["labels"]
+    ]
   }
 }
 

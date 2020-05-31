@@ -12,6 +12,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "redis-data"
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: retained-ssd
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -50,7 +63,8 @@ spec:
             memory: 200Mi
       volumes:
       - name: redis-data
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: "redis-data"
 ---
 apiVersion: v1
 kind: Service
