@@ -38,8 +38,7 @@ resource google_container_cluster mark_interview_cluster {
       disable-legacy-endpoints = "true"
     }
     oauth_scopes = [
-      "https://www.googleapis.com/auth/logging.write",
-      "https://www.googleapis.com/auth/monitoring",
+      "https://www.googleapis.com/auth/cloud-platform"
     ]
   }
 
@@ -56,5 +55,27 @@ resource google_container_cluster mark_interview_cluster {
       disabled = false
     }
   }
+  network_policy {
+    enabled = true
+    provider = "CALICO"
+  }
 
+  provisioner local-exec {
+    command = "gcloud container clusters get-credentials ${google_container_cluster.mark_interview_cluster.name} --zone=${var.zone}"
+  }
+}
+
+resource kubernetes_storage_class retained_ssd {
+  metadata {
+    name = "retained-ssd"
+  }
+  storage_provisioner = "kubernetes.io/gce-pd"
+  reclaim_policy = "Retain"
+  volume_binding_mode = "WaitForFirstConsumer"
+  parameters = {
+    type = "pd-ssd"
+    replication-type = "regional-pd"
+  }
+
+  depends_on = [google_container_cluster.mark_interview_cluster]
 }

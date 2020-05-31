@@ -1,3 +1,4 @@
 compute.googleapis.com
 container.googleapis.com
 containerregistry.googleapis.com
+cloudbuild.googleapis.com
