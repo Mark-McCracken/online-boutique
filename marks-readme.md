@@ -10,7 +10,11 @@
 1. Loosely following the guide in the readme, install skaffold, and run the command to build all items. 
 Make use of Google Cloud Build and use eu.gcr.io, as cluster was deployed in EU, and images will be faster to fetch
 than gcr.io, which is based in the US. `skaffold run --default-repo=eu.gcr.io/$(gcloud config get-value project)`
-
+1. Import the LoadBalancer service, to use it's IP address:
+`terraform import kubernetes_service.frontend default/frontend-external`
+1. Import the DNS managed zone, so it can be referenced by the DNS record:
+`terraform import google_dns_managed_zone.k8s_careers_mark projects/$(gcloud config get-value project)/managedZones/k8s-careers-mark`
+1. Create the DNS record, referencing the managed zone and Load Balancer IP address
 
 ## Summary of mistakes...
 

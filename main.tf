@@ -79,3 +79,47 @@ resource kubernetes_storage_class retained_ssd {
 
   depends_on = [google_container_cluster.mark_interview_cluster]
 }
+
+# imported
+resource kubernetes_service frontend {
+  metadata {
+    name = "frontend-external"
+    labels = {
+      "skaffold.dev/builder"    = "google-cloud-build"
+      "skaffold.dev/cleanup"    = "true"
+      "skaffold.dev/deployer"   = "kubectl"
+      "skaffold.dev/profile.0"  = "gcb"
+      "skaffold.dev/run-id"     = "e7244b0b-92c7-48ba-b276-b1f118a811ae"
+      "skaffold.dev/tag-policy" = "git-commit"
+      "skaffold.dev/tail"       = "true"
+    }
+  }
+  spec {
+    selector = {
+      app = "frontend"
+    }
+    port {
+      name = "http"
+      node_port = 31576
+      port = 80
+      protocol = "TCP"
+      target_port = "8080"
+    }
+    type = "LoadBalancer"
+  }
+}
+
+# imported
+resource google_dns_managed_zone k8s_careers_mark {
+  name = "k8s-careers-mark"
+  dns_name = "mark.future.k8s.careers."
+  description = "Public delegated interview zone"
+}
+
+resource google_dns_record_set frontend {
+  name = "frontend.${google_dns_managed_zone.k8s_careers_mark.dns_name}"
+  type = "A"
+  ttl = 300
+  managed_zone = google_dns_managed_zone.k8s_careers_mark.name
+  rrdatas = [kubernetes_service.frontend.load_balancer_ingress[0].ip]
+}
