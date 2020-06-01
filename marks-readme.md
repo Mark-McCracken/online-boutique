@@ -15,6 +15,8 @@ than gcr.io, which is based in the US. `skaffold run --default-repo=eu.gcr.io/$(
 1. Import the DNS managed zone, so it can be referenced by the DNS record:
 `terraform import google_dns_managed_zone.k8s_careers_mark projects/$(gcloud config get-value project)/managedZones/k8s-careers-mark`
 1. Create the DNS record, referencing the managed zone and Load Balancer IP address
+1. Modify the redis-cart yaml, adding a PVC, and changing the volume mounted from emptyDir to a PVC
+1. Re-run skaffold deployment
 
 ## Summary of mistakes...
 
@@ -42,13 +44,13 @@ so this had to be re-created.
 ### Separate slow moving infrastructure from fast moving software
 
 Terraform can be quite nice for someone to read, to understand what components are required to get the project up and
-running.
+running, even if it isn't always nice to write.
 
 However, I find it to be something a human would be more likely to carefully review and deploy manually, and less
 likely to automate.
 
 Also, terraform aims to represent a desired state, but this desired state often requires imperative steps that need to
-be performed in order, which can
+be performed in order, which can make it difficult deploying the whole thing to a new project.
 
 The components of the software on the other hand, are likely to move much faster, and the need for automation is a lot
 greater.
@@ -56,5 +58,5 @@ greater.
 So I tend to use a CI/CD platform for this, such as github actions or google cloud build.
 
 I find this creates a bit of tension between the 2 tools, there will almost certainly be a dependency formed between
-them. In this case, we want something concrete like a DNS entry to be specified, dependant on the LoadBalancer's
+them. In this case, we want something concrete like a DNS entry to be specified, dependent on the LoadBalancer's
 IP address, requiring manual import.
